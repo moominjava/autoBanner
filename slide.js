@@ -104,6 +104,7 @@ window.addEventListener('load', function(){
     
     //autoPlay
     //지정시간마다 플레이 
+    //setInterval : 일정시간마다 함수를 실행한다.
     playSet = setInterval(function(){
         if(!moveIng){
         	//after를 1씩 증가 , 배너수보다 커질경우 다시 0을부여 
@@ -117,16 +118,22 @@ window.addEventListener('load', function(){
     }, AUTO_TIME);
 
     //numbersButton
+    //숫자 버튼 클릭 이벤트
+    //target : 숫자버튼 번호
     function slide_numClick(target){
         slide_num.children[target].addEventListener('click', function(){
+        	//다른 버튼이 눌리기전에 버튼을 모두 회색이미지로 초기화
         	init_number_button();
+        	//선택된버튼을 변수로 이벤트함수를 호출한다
         	select_number_button(target);
         	
             if(!moveIng){
                 after = target;
+                //after가before보다 클경우는 뒤의 이미지를 불러오기 때문에 next변수를 대입한다
                 if(after > before){
                     move(after, before, 'next');
                 }else if(after < before){
+                	//after보다 before가 클경우에는 앞의 이미지를 불러오기 때문에 next변수를 뺀다
                     move(after, before);
                 };
                 before = after;
@@ -135,23 +142,36 @@ window.addEventListener('load', function(){
     }
 
     //slideBanner
+    //배너의 움직임 설정 함수
     function move(after, before, type){
+    	// "==="는 엄격한 비교연산자, 값과 자료형을 모두 확인한다
+    	// javascript 3항연산자 : (조건) ? exp1 : exp2 > 조건이 참이면 exp1실행, 거짓이면 exp2실행
+    	// offsetWidth : margin값을 제외한 padding값, border값을 계산한 값을 가져온다
+    	// type이 next이면 slide의 요소 크기값을 가져온다 , type이 next가 아니면 slide의HTML요소값에 -1을 곱한다.
         var nextX = type === 'next' ? slide.offsetWidth : slide.offsetWidth * -1,
             prevX = 0,
             set = null;
         set = setInterval(function(){
             moveIng = true;
             if(type === 'next'){
+            	//nextx에서 배너의 갯수(MOVING_BANNER)를 뺀 수를 nextx에 대입한다.
                 nextX -= MOVING_BANNER;
+                //slide의 왼쪽에 next만큼의 px를 부여한다.앞쪽에 공간이 없어지면서 다음의 배너를 가져온다.
                 slide_Li_item[after].style.left = nextX + 'px';
+                //nextx가 0보다 작거나 같은 경우 (앞의베너로 이동하기위한조건)
                 if(nextX <= 0){
+                	//clearInterval: setInterval로 반복하고 있는 것을 멈추게 한다.
                     clearInterval(set);
                     nextX = slide.offsetWidth;
                     moveIng = false;
                 };
+                //
                 prevX -= MOVING_BANNER;
             }else{
+            	//type이 next와 다른경우
+            	//nextx에 배너의 width를 더한 값을 부여한다.
                 nextX += MOVING_BANNER;
+                //slide왼쪽에 nextx만큼의px를 부여한다. 앞쪽이 밀려나면서 이전 배너를 확인한다.
                 slide_Li_item[after].style.left = nextX + 'px';
                 if(nextX >= 0){
                     clearInterval(set);
@@ -162,9 +182,13 @@ window.addEventListener('load', function(){
             };
             slide_Li_item[before].style.left = prevX + 'px';
         });
+        //번호 버튼의 배경 클래스에 on를 삭제하여css 적용을 해제한다.
         slide_num.children[before].classList.remove('on');
+        //번호 색깔 초기화 함수를 실행시킨다
         init_number_button();
+        //번호 버튼의 배경 클래스에 on을 부여하여 css를 적용시킨다.
         slide_num.children[after].classList.add('on');
+        //선택된 번호에 새로운 이미지를 적용시킨다.
         select_number_button(after);
     }
 });
